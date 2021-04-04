@@ -1,10 +1,8 @@
-﻿@model PhonesAndPeople.Models.IndexViewModel
-@using PhonesAndPeople.Helpers
+﻿@model IEnumerable<PhonesAndPeople.Models.Person>
 @{
-    ViewBag.Title = "NameSearch";
+    ViewBag.Title = "LNameSearch";
 }
 
-<h2>Поиск по имени</h2>
 <table class="table">
     <tr>
         <th>
@@ -14,7 +12,7 @@
             Префикс
         </th>
         <th>
-            Имя
+            Имя 
         </th>
         <th>
             Фамилия
@@ -28,11 +26,11 @@
         <th></th>
     </tr>
 
-    @foreach (var item in Model.People)
+    @foreach (var item in Model)
     {
         <tr>
             <td>
-                <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this)"> </a>
+                <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this)">
                     <img id="picture" src=@item.Picture.ToString() alt="Image" />
             </td>
             <td>
@@ -53,6 +51,3 @@
         </tr>
     }
 </table>
-<div class="btn-group">
-    @Html.PageLinks(Model.PageInfo, x => Url.Action("NameSearch", new { page = x }))
-</div>

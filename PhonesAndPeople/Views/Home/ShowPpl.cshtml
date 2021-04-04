@@ -1,0 +1,68 @@
+﻿@model PhonesAndPeople.Models.IndexViewModel
+@using PhonesAndPeople.Helpers
+@Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+@{
+    ViewBag.Title = "ShowPpl";
+}
+<table id="olo" class="table">
+    <tr>
+
+    </tr>
+    @foreach (var item in Model.People)
+    {
+        <tr>
+            <td>
+                <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this)"> </a>
+                <img id="picture" src=@item.Picture.ToString() alt="Image" />
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SecondName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Phone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
+</table>
+<br />
+<div class="btn-group">
+    @using (Ajax.BeginForm("ShowPpl", new AjaxOptions { UpdateTargetId = "olo" }))
+            {
+                <input type="hidden" name ="page" value="@Model.PageInfo.PageNumber + 1" />
+                <input type="submit" value="Next" />
+            }
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("ShowPpl", new { page = x }))
+</div>
+@*@section scripts
+{
+    <script>
+        $(document).ready(function (event) {
+            $("#butNext").click(function (even) {
+                nextPage();
+            });
+        });
+        function nextPage() {
+            $("#olo").css("display:none")
+            $.ajax({
+                url: "Home/ShowPpl",
+                type: "POST",
+                data: {page = @Model.PageInfo.PageNumber + 1},
+            });
+        }
+    </script>
+    }*@
+

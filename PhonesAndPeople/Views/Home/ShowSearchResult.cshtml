@@ -54,5 +54,5 @@
     }
 </table>
 <div class="btn-group">
-    @Html.PageLinks(Model.PageInfo, x => Url.Action("NameSearch", new { page = x }))
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("ShowSearchResult", new { page = x }))
 </div>
