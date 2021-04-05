@@ -188,6 +188,7 @@
     <Content Include="Views\Home\Sort.cshtml" />
     <Content Include="Views\Home\ShowSearchResult.cshtml" />
     <Content Include="Views\Home\ShowPpl.cshtml" />
+    <Content Include="Views\Home\TestAjax.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

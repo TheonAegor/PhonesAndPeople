@@ -10,37 +10,38 @@
     <p>
         @Html.ActionLink("Create New", "Create")
     </p>
-    @using (Ajax.BeginForm("ShowPpl", new AjaxOptions { UpdateTargetId = "olo" })) //updateTargetId элемент html в который будет загружать ответ
-    {
+    @*@using (Ajax.BeginForm("ShowPpl", new AjaxOptions { UpdateTargetId = "olo" })) //updateTargetId элемент html в который будет загружать ответ
+    {*@
         <h2>Поиск</h2>
         <table>
-            <tr>
-                <th>
-                    Префикс
-                </th>
-                <th>
-                    Имя
-                </th>
-                <th>
-                    Фамилия
-                </th>
-            </tr>
-            <tr>
-                <td>
-                    <input type="text" name="fName" />
-                </td>
-                <td>
-                    <input type="text" name="sName" />
-                </td>
-                <td>
-                    <input type="text" name="lName" />
-                </td>
-                <td>
-                    <input type="submit" value="Поиск" />
-                </td>
-            </tr>
+            @*<form id="form">*@
+                <tr>
+                    <th>
+                        Префикс
+                    </th>
+                    <th>
+                        Имя
+                    </th>
+                    <th>
+                        Фамилия
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="fName" class="fname" />
+                    </td>
+                    <td>
+                        <input type="text" name="sName" class="sname" />
+                    </td>
+                    <td>
+                        <input type="text" name="lName" class="lname" />
+                    </td>
+                    <td>
+                        <input type="submit" value="Поиск" class="submit" />
+                    </td>
+                </tr>
+            @*</form>*@
         </table>
-    }
 <table id="mainTable" class="table">
     <tr>
         <th>
@@ -107,16 +108,27 @@
     </div>
 @section scripts
 {
-    @*<script type="text/javascript">
+    <script type="text/javascript">
+        //alert("Hello");
             $(document).ready(function () {
-
-                $("#search").click(function (event) {
+                $("input.submit").click(function (event) {
+                    //alert("Handler for submit was called.");
                     hideElems();
                 });
 
             });
-            function hideElems() {
-                $("#mainTable").css('display', 'none');
+        function hideElems() {
+            //alert("hideElems func is called.");
+                $(".btn-group").css('display', 'none');
+                $.ajax({
+                    url: "ShowPpl",
+                    method: "POST",
+                    data: { "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val() },
+                    success: function (result) {
+                        //alert("succes handler is called.");
+                        $('#mainTable').html(result);
+                    }
+                });
             }
-        </script>*@
+        </script>
 }

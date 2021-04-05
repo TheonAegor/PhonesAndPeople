@@ -47,7 +47,7 @@ namespace PhonesAndPeople.Controllers
             return View(ivm);
         }
         [HttpPost]
-        public ActionResult ShowPpl(string fName = "", string sName = "", string lName = "", int page = 1)
+        public PartialViewResult ShowPpl(string fName = "", string sName = "", string lName = "", int page = 1)
         {
             IndexViewModel ivm = new IndexViewModel();
             int pageSize = 10; //amount of objects on page
@@ -186,6 +186,17 @@ namespace PhonesAndPeople.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+        [HttpGet]
+        public ActionResult TestAjax()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public PartialViewResult TestAjaxPost()
+        {
+            return PartialView();
         }
 
         protected override void Dispose(bool disposing)

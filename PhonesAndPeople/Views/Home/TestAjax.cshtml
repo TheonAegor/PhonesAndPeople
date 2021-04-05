@@ -1,0 +1,30 @@
+﻿
+@{
+    ViewBag.Title = "TestAjax";
+}
+
+
+<h2>TestAjax</h2>
+<div class="main">
+    <input type="text" name="test" class="txt"/>
+    <input type="submit"/>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            helo();
+        });
+        function helo() {
+            $.ajax({
+                url: "Home/TestAjax2",
+                type: "POST",
+                data: { test = $("input.txt"}),
+                success: function(result) {
+                    $("div.main").html(result);
+                }
+            })
+        }
+    </script>
+}
+

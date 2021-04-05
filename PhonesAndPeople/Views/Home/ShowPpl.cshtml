@@ -1,12 +1,10 @@
 ﻿@model PhonesAndPeople.Models.IndexViewModel
 @using PhonesAndPeople.Helpers
-@Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
 @{
     ViewBag.Title = "ShowPpl";
 }
 <table id="olo" class="table">
     <tr>
-
     </tr>
     @foreach (var item in Model.People)
     {
@@ -40,29 +38,68 @@
 </table>
 <br />
 <div class="btn-group">
-    @using (Ajax.BeginForm("ShowPpl", new AjaxOptions { UpdateTargetId = "olo" }))
-            {
-                <input type="hidden" name ="page" value="@Model.PageInfo.PageNumber + 1" />
-                <input type="submit" value="Next" />
-            }
-    @Html.PageLinks(Model.PageInfo, x => Url.Action("ShowPpl", new { page = x }))
+    <input id="btn-prev" type="button" name="prev" value="<<" class="btn btn-default" />
+    <input id="btn-this" type="button" name="this" value="@Model.PageInfo.PageNumber" class="btn btn-default btn-primary selected" />
+    <input id="btn-last" type="button" name="last" value="@Model.PageInfo.TotalPages" class="btn btn-default" />
+    <input id="btn-next" type="button" name="next" value=">>" class="btn btn-default" />
 </div>
-@*@section scripts
-{
-    <script>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+<script type="text/javascript">
+        //alert("Hello");
         $(document).ready(function (event) {
-            $("#butNext").click(function (even) {
+            if (@Model.PageInfo.PageNumber <= 1)
+                $("#btn-prev").hide();
+            else {
+                $("#btn-prev").click(function (event) {
+                    $(".btn-group").hide();
+                    prevPage();
+                });
+            }
+            $("#btn-last").click(function (event) {
+                //alert("Last page click.")
+                $(".btn-group").hide();
+                lastPage();
+            });
+            $("#btn-next").click(function (event) {
+                //alert("Next page click.")
+                $(".btn-group").hide();
                 nextPage();
             });
         });
+    function prevPage() {
+        $.ajax({
+            url: "ShowPpl",
+            type: "POST",
+            data: { "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": (@Model.PageInfo.PageNumber - 1) },
+            success: function (result) {
+                alert("succes handler is called.");
+                $('#olo').html(result);
+            }
+        });
+    }
         function nextPage() {
-            $("#olo").css("display:none")
             $.ajax({
-                url: "Home/ShowPpl",
+                url: "ShowPpl",
                 type: "POST",
-                data: {page = @Model.PageInfo.PageNumber + 1},
+                data: { "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.PageNumber + 1 },
+                success: function (result) {
+                    alert("succes handler is called.");
+                    $('#olo').html(result);
+                }
             });
         }
-    </script>
-    }*@
+        function lastPage() {
+            $.ajax({
+                url: "ShowPpl",
+                type: "POST",
+                data: { "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.TotalPages },
+                success: function (result) {
+                    alert("succes handler is called.");
+                    $('#olo').html(result);
+                }
+            });
+        }
+</script>
 
