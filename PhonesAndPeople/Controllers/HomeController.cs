@@ -29,7 +29,11 @@ namespace PhonesAndPeople.Controllers
             IEnumerable<Person> personsPerPages;
             Person pers = new Person();
             List<Person> people = new List<Person>();
+            SortState sortOrder = SortState.FNameAsc;
 
+            ViewData["FNameSort"] = sortOrder == SortState.FNameAsc ? SortState.FNameDesc : SortState.FNameAsc;
+            ViewData["SNameSort"] = sortOrder == SortState.SNameAsc ? SortState.SNameDesc : SortState.SNameAsc;
+            ViewData["LNameSort"] = sortOrder == SortState.LNameAsc ? SortState.LNameDesc : SortState.LNameAsc;
             people = db.People.ToList();
             if (fName != "")
                 people = people.Where(a => a.FirstName.Contains(fName)).ToList();
@@ -39,7 +43,7 @@ namespace PhonesAndPeople.Controllers
                 people = people.Where(a => a.LastName.Contains(lName)).ToList();
             personsPerPages = db.People.ToList()
                     .OrderBy(x => x.Id)
-                    .Skip((page - 1) * pageSize)
+                    .Skip((page - 1) * pageSize) 
                     .Take(pageSize).ToList();
             PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = db.People.Count() };
             ivm.PageInfo = pageInfo;
@@ -47,7 +51,7 @@ namespace PhonesAndPeople.Controllers
             return View(ivm);
         }
         [HttpPost]
-        public PartialViewResult ShowPpl(string fName = "", string sName = "", string lName = "", int page = 1)
+        public PartialViewResult ShowPpl(SortState sortOrder = SortState.FNameAsc, string fName = "", string sName = "", string lName = "", int page = 1)
         {
             IndexViewModel ivm = new IndexViewModel();
             int pageSize = 10; //amount of objects on page
@@ -63,11 +67,25 @@ namespace PhonesAndPeople.Controllers
             if (lName != "")
                 people = people.Where(a => a.LastName.Contains(lName)).ToList();
 
-            personsPerPages = people
-                    .OrderBy(x => x.Id)
+            //IQueryable<Person> people = db.People;
+            IQueryable<Person> ppl= people.AsQueryable(); ;
+            
+            ViewData["FNameSort"] = sortOrder == SortState.FNameAsc ? SortState.FNameDesc : SortState.FNameAsc;
+            ViewData["SNameSort"] = sortOrder == SortState.SNameAsc ? SortState.SNameDesc : SortState.SNameAsc;
+            ViewData["LNameSort"] = sortOrder == SortState.LNameAsc ? SortState.LNameDesc : SortState.LNameAsc;
+            ViewData["LastSortAttr"] = sortOrder;
+
+            if (sortOrder == SortState.FNameDesc) ppl = ppl.OrderByDescending(s => s.FirstName);
+            if (sortOrder == SortState.FNameAsc) ppl = ppl.OrderBy(s => s.FirstName);
+            if (sortOrder == SortState.SNameAsc) ppl = ppl.OrderBy(s => s.SecondName);
+            if (sortOrder == SortState.SNameDesc) ppl = ppl.OrderByDescending(s => s.SecondName);
+            if (sortOrder == SortState.LNameAsc) ppl = ppl.OrderBy(s => s.LastName);
+            if (sortOrder == SortState.LNameDesc) ppl = ppl.OrderByDescending(s => s.SecondName);
+
+            personsPerPages = ppl
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize).ToList();
-            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = people.Count() };
+            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = ppl.Count() };
             ivm.PageInfo = pageInfo;
             ivm.People = personsPerPages;
 

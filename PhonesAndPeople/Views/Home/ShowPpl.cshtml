@@ -1,40 +1,73 @@
 ﻿@model PhonesAndPeople.Models.IndexViewModel
 @using PhonesAndPeople.Helpers
+@Styles.Render("~/Content/css")
 @{
     ViewBag.Title = "ShowPpl";
 }
 <table id="olo" class="table">
     <tr>
+        <th>
+            Фото
+        </th>
+        <th>
+            <a id="sortFname" class="sort" onclick="sortAttr(1)">
+                Префикс
+            </a> 
+        </th>
+        <th>
+            <a id="sortSname" class="sort" onclick="sortAttr(2)">
+                Имя
+            </a>
+        </th>
+        <th>
+            <a id="sortLname" class="sort" onclick="sortAttr(3)">
+                Фамилия
+            </a>
+        </th>
+        <th>
+            <a id="sortDob">
+                Дата рождения
+            </a>
+        </th>
+        <th>
+            Телефон
+        </th>
+        <th>
+            Почта
+        </th>
+        <th></th>
     </tr>
-    @foreach (var item in Model.People)
-    {
-        <tr>
-            <td>
-                <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this)"> </a>
-                <img id="picture" src=@item.Picture.ToString() alt="Image" />
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SecondName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Phone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-            </td>
-        </tr>
-    }
+    <tbody>
+        @foreach (var item in Model.People)
+        {
+            <tr>
+                <td>
+                    <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this)"> </a>
+                    <img id="picture" src=@item.Picture.ToString() alt="Image" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SecondName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Phone)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>
 <br />
 <div class="btn-group">
@@ -72,7 +105,7 @@
         $.ajax({
             url: "ShowPpl",
             type: "POST",
-            data: { "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": (@Model.PageInfo.PageNumber - 1) },
+            data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": (@Model.PageInfo.PageNumber - 1) },
             success: function (result) {
                 alert("succes handler is called.");
                 $('#olo').html(result);
@@ -83,7 +116,7 @@
             $.ajax({
                 url: "ShowPpl",
                 type: "POST",
-                data: { "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.PageNumber + 1 },
+                data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.PageNumber + 1 },
                 success: function (result) {
                     alert("succes handler is called.");
                     $('#olo').html(result);
@@ -94,7 +127,7 @@
             $.ajax({
                 url: "ShowPpl",
                 type: "POST",
-                data: { "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.TotalPages },
+                data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.TotalPages },
                 success: function (result) {
                     alert("succes handler is called.");
                     $('#olo').html(result);

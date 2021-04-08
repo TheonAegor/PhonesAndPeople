@@ -1,52 +1,23 @@
 ﻿@model PhonesAndPeople.Models.IndexViewModel
 @using PhonesAndPeople.Helpers
+@using PhonesAndPeople.Models
 @Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
-    @{
-        ViewBag.Title = "ShowPeople";
-    }
+@Styles.Render("~/Content/css")
+@{
+    ViewBag.Title = "ShowPeople";
+}
 
-    <h4>Телефонный справочник</h4>
+<h4>Телефонный справочник</h4>
 
-    <p>
-        @Html.ActionLink("Create New", "Create")
-    </p>
-    @*@using (Ajax.BeginForm("ShowPpl", new AjaxOptions { UpdateTargetId = "olo" })) //updateTargetId элемент html в который будет загружать ответ
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+@*@using (Ajax.BeginForm("ShowPpl", new AjaxOptions { UpdateTargetId = "olo" })) //updateTargetId элемент html в который будет загружать ответ
     {*@
-        <h2>Поиск</h2>
-        <table>
-            @*<form id="form">*@
-                <tr>
-                    <th>
-                        Префикс
-                    </th>
-                    <th>
-                        Имя
-                    </th>
-                    <th>
-                        Фамилия
-                    </th>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="text" name="fName" class="fname" />
-                    </td>
-                    <td>
-                        <input type="text" name="sName" class="sname" />
-                    </td>
-                    <td>
-                        <input type="text" name="lName" class="lname" />
-                    </td>
-                    <td>
-                        <input type="submit" value="Поиск" class="submit" />
-                    </td>
-                </tr>
-            @*</form>*@
-        </table>
-<table id="mainTable" class="table">
+<h2>Поиск</h2>
+<table>
+    @*<form id="form">*@
     <tr>
-        <th>
-
-        </th>
         <th>
             Префикс
         </th>
@@ -56,8 +27,48 @@
         <th>
             Фамилия
         </th>
+    </tr>
+    <tr>
+        <td>
+            <input type="text" name="fName" class="fname" />
+        </td>
+        <td>
+            <input type="text" name="sName" class="sname" />
+        </td>
+        <td>
+            <input type="text" name="lName" class="lname" />
+        </td>
+        <td>
+            <input type="submit" value="Поиск" class="submit" />
+        </td>
+    </tr>
+    @*</form>*@
+</table>
+
+<table id="olo">
+    <tr>
         <th>
-            Дата рождения
+            Фото
+        </th>
+        <th>
+            <a id="sortFname" class="sort" onclick="sortAttr(1)">
+                Префикс
+            </a>
+        </th>
+        <th>
+            <a id="sortSname" class="sort" onclick="sortAttr(2)">
+                Имя
+            </a>
+        </th>
+        <th>
+            <a id="sortLname" class="sort" onclick="sortAttr(3)">
+                Фамилия
+            </a>
+        </th>
+        <th>
+            <a id="sortDob">
+                Дата рождения
+            </a>
         </th>
         <th>
             Телефон
@@ -67,58 +78,61 @@
         </th>
         <th></th>
     </tr>
-    <tbody id="olo">
+    <tbody>
         @foreach (var item in Model.People)
         {
-        <tr>
-            <td>
-                <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this)"> </a>
-                <img id="picture" src=@item.Picture.ToString() alt="Image" />
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SecondName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DoB)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Phone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this)"> </a>
+                    <img id="picture" src=@item.Picture.ToString() alt="Image" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SecondName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoB)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Phone)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
         }
     </tbody>
 </table>
-    <br />
-    <div class="btn-group">
-        @Html.PageLinks(Model.PageInfo, x => Url.Action("ShowPeople", new { page = x }))
-    </div>
+<br />
+<div class="btn-group">
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("ShowPeople", new { page = x }))
+</div>
 @section scripts
 {
     <script type="text/javascript">
-        //alert("Hello");
+            alert("Hello")
             $(document).ready(function () {
                 $("input.submit").click(function (event) {
                     //alert("Handler for submit was called.");
                     hideElems();
                 });
-
+                $(".sort").click(function (event) {
+                    //alert("Handler for submit was called.");
+                    sortAttr();
+                });
             });
         function hideElems() {
-            //alert("hideElems func is called.");
+                //alert("hideElems func is called.");
                 $(".btn-group").css('display', 'none');
                 $.ajax({
                     url: "ShowPpl",
@@ -126,9 +140,30 @@
                     data: { "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val() },
                     success: function (result) {
                         //alert("succes handler is called.");
-                        $('#mainTable').html(result);
+                        $('#olo').html(result);
                     }
                 });
-            }
-        </script>
+        }
+        function sortAttr(num) {
+            var n;
+            //alert("FNameSort = " + ViewBag.FNameSort);
+            if (num === 1)
+                n = '@ViewBag.FNameSort';
+            if (num == 2)
+                n = '@ViewBag.SNameSort';
+            if (num == 3)
+                n = '@ViewBag.LNameSort';
+
+            alert("inside sortAttr n=" + n);
+            $.ajax({
+                url: "ShowPpl",
+                method: "POST",
+                data: {"sortOrder": n, "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val() },
+                success: function (result) {
+                    //alert("succes handler is called.");
+                    $('#olo').html(result);
+                }
+            });
+        }
+    </script>
 }

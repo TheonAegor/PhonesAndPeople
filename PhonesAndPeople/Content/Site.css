@@ -22,3 +22,48 @@ select,
 textarea {
     max-width: 280px;
 }
+
+    table {
+    border-collapse: collapse;
+    width: calc(100% - 17px);
+    padding-right: 17px;
+}
+
+    thead {
+    text-align: left;
+    display: table;
+    float: left;
+    width: 100%;
+}
+
+    thead tr {
+        display: table-row;
+        width: 100%;
+    }
+
+    tbody {
+    display: block;
+    height: 120px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    float: left;
+    width: calc(100% + 17px);
+}
+
+    tbody tr {
+        display: table;
+        width: 100%;
+    }
+
+    tbody tr {
+        height: 18px;
+    }
+
+    tbody td {
+        padding: 1px 8px;
+    }
+
+    th, td {
+    border: 1px solid black;
+    width: 25%;
+    }
