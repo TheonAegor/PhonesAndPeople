@@ -35,6 +35,7 @@ namespace PhonesAndPeople.Models
     {
         public IEnumerable<Person> People { get; set; }
         public PageInfo PageInfo { get; set; }
+        public DateViewModel DateViewModel { get; set; }
     }
     public enum SortState
     {

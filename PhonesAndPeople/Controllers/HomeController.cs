@@ -46,37 +46,61 @@ namespace PhonesAndPeople.Controllers
                 return RedirectToAction("AdminView", "Account");
         }
 
-        public ActionResult ShowPeople(SortState sortOrder = SortState.FNameAsc, string fName = "", string sName = "", string lName = "", int page = 1)
+        public ActionResult ShowPeople(int? year = 0, int? month = 0, int? day = 0, SortState sortOrder = SortState.FNameAsc, string fName = "", string sName = "", string lName = "", int page = 1)
         {
             IndexViewModel ivm = new IndexViewModel();
             int pageSize = 10; //amount of objects on page
             IEnumerable<Person> personsPerPages;
             Person pers = new Person();
             List<Person> people = new List<Person>();
+            SelectList Years;
+
 
             ViewData["FNameSort"] = sortOrder == SortState.FNameAsc ? SortState.FNameDesc : SortState.FNameAsc;
             ViewData["SNameSort"] = sortOrder == SortState.SNameAsc ? SortState.SNameDesc : SortState.SNameAsc;
             ViewData["LNameSort"] = sortOrder == SortState.LNameAsc ? SortState.LNameDesc : SortState.LNameAsc;
             ViewData["Dob"] = sortOrder == SortState.DobAsc ? SortState.DobDesc : SortState.DobAsc;
             ViewData["LastSortAttr"] = sortOrder;
+            ViewData["FiltYear"] = year;
+            ViewData["FiltMonth"] = month;
+            ViewData["FiltDay"] = day;
             people = db.People.ToList();
+            //IQueryable<Person> people1 = people.AsQueryable();
+            if (year > 0)
+                people = people.Where(p => p.DoB.Year == year).ToList();
+            if (month > 0)
+                people = people.Where(p => p.DoB.Month == month).ToList();
+            if (day > 0)
+                people = people.Where(p => p.DoB.Day == day).ToList();
+
             if (fName != "")
                 people = people.Where(a => a.FirstName.Contains(fName)).ToList();
             if (sName != "")
                 people = people.Where(a => a.SecondName.Contains(sName)).ToList();
             if (lName != "")
                 people = people.Where(a => a.LastName.Contains(lName)).ToList();
-            personsPerPages = db.People.ToList()
-                    .OrderBy(x => x.Id)
+
+            personsPerPages = people.ToList()
                     .Skip((page - 1) * pageSize) 
                     .Take(pageSize).ToList();
-            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = db.People.Count() };
+
+            Years = new SelectList ((from p in db.People 
+                      select p.DoB.Year).Distinct().OrderBy(x=>x).ToList(),  "year");
+
+            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = people.Count() };
             ivm.PageInfo = pageInfo;
             ivm.People = personsPerPages;
+            ivm.DateViewModel = new DateViewModel
+            {
+                Years = Years,
+                Months = new SelectList((from p in people select p.DoB.Month).Distinct().OrderBy(x => x).ToList(), "month"),
+                Days = new SelectList((from p in people select p.DoB.Day).Distinct().OrderBy(x => x).ToList(), "day")
+            };
             return View(ivm);
         }
+
         [HttpPost]
-        public PartialViewResult ShowPpl(SortState sortOrder = SortState.FNameAsc, string fName = "", string sName = "", string lName = "", int page = 1)
+        public PartialViewResult ShowPpl(int? year, int? month, int? day, SortState sortOrder = SortState.FNameAsc, string fName = "", string sName = "", string lName = "", int page = 1)
         {
             IndexViewModel ivm = new IndexViewModel();
             int pageSize = 10; //amount of objects on page
@@ -85,6 +109,14 @@ namespace PhonesAndPeople.Controllers
             List<Person> people = new List<Person>();
 
             people = db.People.ToList();
+
+            if (year > 0)
+                people = people.Where(p => p.DoB.Year == year).ToList();
+            if (month > 0)
+                people = people.Where(p => p.DoB.Month == month).ToList();
+            if (day > 0)
+                people = people.Where(p => p.DoB.Day == day).ToList();
+
             if (fName != "")
                 people = people.Where(a => a.FirstName.Contains(fName)).ToList();
             if (sName != "")
@@ -117,7 +149,12 @@ namespace PhonesAndPeople.Controllers
             PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = ppl.Count() };
             ivm.PageInfo = pageInfo;
             ivm.People = personsPerPages;
-
+            ivm.DateViewModel = new DateViewModel
+            {
+                Years = new SelectList((from p in people select p.DoB.Month).Distinct().OrderBy(x => x).ToList(), "month"),
+                Months = new SelectList((from p in people select p.DoB.Month).Distinct().OrderBy(x => x).ToList(), "month"),
+                Days = new SelectList((from p in people select p.DoB.Day).Distinct().OrderBy(x => x).ToList(), "day")
+            };
             return PartialView(ivm);
         }
         public async Task<RedirectToRouteResult> FillDbAsync(int page=1)

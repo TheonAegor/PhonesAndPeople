@@ -142,6 +142,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\PagingHelpers.cs" />
+    <Compile Include="Models\DateViewModel.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Models\Person.cs" />
     <Compile Include="Models\PersonContext.cs" />

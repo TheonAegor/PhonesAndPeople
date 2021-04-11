@@ -46,6 +46,10 @@ td, th {
     border-bottom: 1px solid silver;
 }
 
+th {
+    font-size: medium
+}
+
 .bigPicture {
     display: none;
 }

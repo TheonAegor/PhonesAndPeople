@@ -6,7 +6,6 @@
     ViewBag.Title = "Список пользователей";
 }
 
-<h4>Телефонный справочник</h4>
 @*@using (Ajax.BeginForm("ShowPpl", new AjaxOptions { UpdateTargetId = "olo" })) //updateTargetId элемент html в который будет загружать ответ
     {*@
 <h2>Поиск</h2>
@@ -37,7 +36,21 @@
         </td>
     </tr>
 </table>
-
+<br />
+<div id="filter-field">
+    <form method="get">
+        <label class="control-label"> Год</label>
+            @Html.DropDownList("year", Model.DateViewModel.Years as SelectList, "Любой",
+                    htmlAttributes: new { @class = "form-control" })
+        <label class="control-label">Месяц</label>
+            @Html.DropDownList("month", Model.DateViewModel.Months as SelectList, "Любой",
+                    htmlAttributes: new { @class = "form-control" })
+        <label class="control-label">День</label>
+            @Html.DropDownList("day", Model.DateViewModel.Days as SelectList, "Любой",
+                    htmlAttributes: new { @class = "form-control" })
+            <input type="submit" value="Фильтр" class="btn btn-default" />
+    </form>
+</div>
 <table id="olo">
     <tbody class="person-data-header">
         <tr>
@@ -72,9 +85,7 @@
         {
             <tr>
                 <td>
-                    <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this, src: @item.PictureBig.ToString())">
-                        <img class="picture" src=@item.Picture.ToString() alt="Image" onclick="enlargeImg(@item.PictureBig.ToString())" />
-                    </a>
+                    <img class="picture" src=@item.Picture.ToString() alt="Image" onclick="enlargeImg(@item.PictureBig.ToString())" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.FirstName)
@@ -94,7 +105,7 @@
 </table>
 <br />
 <div class="btn-group">
-    @Html.PageLinks(Model.PageInfo, x => Url.Action("ShowPeople", new { page = x }))
+    @Html.PageLinks(Model.PageInfo, x => Url.Action("ShowPeople", new { page = x, year = ViewBag.FiltYear, month = ViewBag.FiltMonth, day = ViewBag.FiltDay }))
 </div>
 @section scripts
 {
@@ -112,7 +123,8 @@
         });
         function hideElems() {
                 //alert("hideElems func is called.");
-                $(".btn-group").css('display', 'none');
+            $(".btn-group").css('display', 'none');
+            //$("#filter-field").css('display', 'none');
                 $.ajax({
                     url: "ShowPpl",
                     method: "POST",
@@ -125,6 +137,7 @@
         }
         function sortAttr(num) {
             $(".btn-group").hide();
+            //$("#filter-field").css('display', 'none');
             var n;
             //alert("FNameSort = " + ViewBag.FNameSort);
             if (num === 1)
@@ -137,7 +150,7 @@
                 n = '@ViewBag.Dob';
 
 
-            alert("inside sortAttr n=" + n);
+            //alert("inside sortAttr n=" + n);
             $.ajax({
                 url: "ShowPpl",
                 method: "POST",
