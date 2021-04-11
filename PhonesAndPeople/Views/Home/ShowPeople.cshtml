@@ -1,22 +1,16 @@
 ﻿@model PhonesAndPeople.Models.IndexViewModel
 @using PhonesAndPeople.Helpers
 @using PhonesAndPeople.Models
-@Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
-@Styles.Render("~/Content/css")
+@Scripts.Render("~/highslide.js")
 @{
-    ViewBag.Title = "ShowPeople";
+    ViewBag.Title = "Список пользователей";
 }
 
 <h4>Телефонный справочник</h4>
-
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
 @*@using (Ajax.BeginForm("ShowPpl", new AjaxOptions { UpdateTargetId = "olo" })) //updateTargetId элемент html в который будет загружать ответ
     {*@
 <h2>Поиск</h2>
-<table>
-    @*<form id="form">*@
+<table id="search-field">
     <tr>
         <th>
             Префикс
@@ -42,49 +36,45 @@
             <input type="submit" value="Поиск" class="submit" />
         </td>
     </tr>
-    @*</form>*@
 </table>
 
 <table id="olo">
-    <tr>
-        <th>
-            Фото
-        </th>
-        <th>
-            <a id="sortFname" class="sort" onclick="sortAttr(1)">
-                Префикс
-            </a>
-        </th>
-        <th>
-            <a id="sortSname" class="sort" onclick="sortAttr(2)">
-                Имя
-            </a>
-        </th>
-        <th>
-            <a id="sortLname" class="sort" onclick="sortAttr(3)">
-                Фамилия
-            </a>
-        </th>
-        <th>
-            <a id="sortDob">
-                Дата рождения
-            </a>
-        </th>
-        <th>
-            Телефон
-        </th>
-        <th>
-            Почта
-        </th>
-        <th></th>
-    </tr>
-    <tbody>
+    <tbody class="person-data-header">
+        <tr>
+            <th>
+                Фото
+            </th>
+            <th>
+                <a id="sortFname" class="sort" onclick="sortAttr(1)">
+                    Префикс
+                </a>
+            </th>
+            <th>
+                <a id="sortSname" class="sort" onclick="sortAttr(2)">
+                    Имя
+                </a>
+            </th>
+            <th>
+                <a id="sortLname" class="sort" onclick="sortAttr(3)">
+                    Фамилия
+                </a>
+            </th>
+            <th>
+                <a id="sortDob" class="sort" onclick="sortAttr(4)">
+                    Дата рождения
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </tbody>
+    <tbody class="person-data">
         @foreach (var item in Model.People)
         {
             <tr>
                 <td>
-                    <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this)"> </a>
-                    <img id="picture" src=@item.Picture.ToString() alt="Image" />
+                    <a href=@item.PictureBig.ToString() class="highslide" onclick="return hs.expand(this, src: @item.PictureBig.ToString())">
+                        <img class="picture" src=@item.Picture.ToString() alt="Image" onclick="enlargeImg(@item.PictureBig.ToString())" />
+                    </a>
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.FirstName)
@@ -98,17 +88,6 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.DoB)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Phone)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                </td>
             </tr>
         }
     </tbody>
@@ -120,17 +99,17 @@
 @section scripts
 {
     <script type="text/javascript">
-            alert("Hello")
-            $(document).ready(function () {
-                $("input.submit").click(function (event) {
-                    //alert("Handler for submit was called.");
-                    hideElems();
-                });
-                $(".sort").click(function (event) {
-                    //alert("Handler for submit was called.");
-                    sortAttr();
-                });
+        $(document).ready(function () {
+            $("input.submit").click(function (event) {
+                //alert("Handler for submit was called.");
+                hideElems();
             });
+
+            $(".sort").click(function (event) {
+                //alert("Handler for submit was called.");
+                sortAttr();
+            });
+        });
         function hideElems() {
                 //alert("hideElems func is called.");
                 $(".btn-group").css('display', 'none');
@@ -145,6 +124,7 @@
                 });
         }
         function sortAttr(num) {
+            $(".btn-group").hide();
             var n;
             //alert("FNameSort = " + ViewBag.FNameSort);
             if (num === 1)
@@ -153,6 +133,9 @@
                 n = '@ViewBag.SNameSort';
             if (num == 3)
                 n = '@ViewBag.LNameSort';
+            if (num == 4)
+                n = '@ViewBag.Dob';
+
 
             alert("inside sortAttr n=" + n);
             $.ajax({

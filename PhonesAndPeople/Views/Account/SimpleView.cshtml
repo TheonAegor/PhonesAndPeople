@@ -1,0 +1,52 @@
+﻿@model PhonesAndPeople.Models.Person
+@Scripts.Render("~/highslide.js")
+
+<table>
+    <tbody class="person-data-header">
+        <tr>
+            <th>
+                Фото
+            </th>
+            <th>
+                Префикс
+            </th>
+            <th>
+                Имя
+            </th>
+            <th>
+                Фамилия
+            </th>
+            <th>
+                Телефон
+            </th>
+            <th>
+                Почта
+            </th>
+            <th></th>
+        </tr>
+    </tbody>
+    <tbody class="simple-view-data">
+        <tr>
+            <td>
+                <a href=@Model.PictureBig.ToString() class="highslide" onclick="return hs.expand(this, src: @Model.PictureBig.ToString())">
+                    <img class="picture" src=@Model.Picture.ToString() alt="Image" />
+                </a>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.SecondName)
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Phone)
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Email)
+            </td>
+        </tr>
+    </tbody>
+</table>

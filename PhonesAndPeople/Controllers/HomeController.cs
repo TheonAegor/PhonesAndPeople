@@ -17,23 +17,48 @@ namespace PhonesAndPeople.Controllers
         PersonContext db = new PersonContext();
         List<Person> ppl = new List<Person>();
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View();
+            using (var UserDb = new UserContext())
+            {
+                if (!UserDb.Database.Exists())
+                {
+                    var account = new AccountController();
+                    await account.FillDbAsync();
+                }
+            }
+            return RedirectToAction("ShowPeople");
+        }
+        [Authorize]
+        public ActionResult Personal()
+        {
+            UserContext context = new UserContext();
+            var user = new User();
+            var person = new Person();
+            
+            user = context.Users.FirstOrDefault(u => u.Email == User.Identity.Name);
+            if (user.Email != "admin")
+            {
+                person = db.People.FirstOrDefault(p => p.Email == user.Email);
+                return RedirectToAction("SimpleView", "Account", person);
+            }
+            else
+                return RedirectToAction("AdminView", "Account");
         }
 
-        public ActionResult ShowPeople(string fName = "", string sName = "", string lName = "", int page = 1)
+        public ActionResult ShowPeople(SortState sortOrder = SortState.FNameAsc, string fName = "", string sName = "", string lName = "", int page = 1)
         {
             IndexViewModel ivm = new IndexViewModel();
             int pageSize = 10; //amount of objects on page
             IEnumerable<Person> personsPerPages;
             Person pers = new Person();
             List<Person> people = new List<Person>();
-            SortState sortOrder = SortState.FNameAsc;
 
             ViewData["FNameSort"] = sortOrder == SortState.FNameAsc ? SortState.FNameDesc : SortState.FNameAsc;
             ViewData["SNameSort"] = sortOrder == SortState.SNameAsc ? SortState.SNameDesc : SortState.SNameAsc;
             ViewData["LNameSort"] = sortOrder == SortState.LNameAsc ? SortState.LNameDesc : SortState.LNameAsc;
+            ViewData["Dob"] = sortOrder == SortState.DobAsc ? SortState.DobDesc : SortState.DobAsc;
+            ViewData["LastSortAttr"] = sortOrder;
             people = db.People.ToList();
             if (fName != "")
                 people = people.Where(a => a.FirstName.Contains(fName)).ToList();
@@ -73,6 +98,7 @@ namespace PhonesAndPeople.Controllers
             ViewData["FNameSort"] = sortOrder == SortState.FNameAsc ? SortState.FNameDesc : SortState.FNameAsc;
             ViewData["SNameSort"] = sortOrder == SortState.SNameAsc ? SortState.SNameDesc : SortState.SNameAsc;
             ViewData["LNameSort"] = sortOrder == SortState.LNameAsc ? SortState.LNameDesc : SortState.LNameAsc;
+            ViewData["Dob"] = sortOrder == SortState.DobAsc ? SortState.DobDesc : SortState.DobAsc;
             ViewData["LastSortAttr"] = sortOrder;
 
             if (sortOrder == SortState.FNameDesc) ppl = ppl.OrderByDescending(s => s.FirstName);
@@ -81,6 +107,9 @@ namespace PhonesAndPeople.Controllers
             if (sortOrder == SortState.SNameDesc) ppl = ppl.OrderByDescending(s => s.SecondName);
             if (sortOrder == SortState.LNameAsc) ppl = ppl.OrderBy(s => s.LastName);
             if (sortOrder == SortState.LNameDesc) ppl = ppl.OrderByDescending(s => s.SecondName);
+            if (sortOrder == SortState.DobAsc) ppl = ppl.OrderBy(s => s.DoB);
+            if (sortOrder == SortState.DobDesc) ppl = ppl.OrderByDescending(s => s.DoB);
+
 
             personsPerPages = ppl
                     .Skip((page - 1) * pageSize)
@@ -93,9 +122,6 @@ namespace PhonesAndPeople.Controllers
         }
         public async Task<RedirectToRouteResult> FillDbAsync(int page=1)
         {
-            //IndexViewModel ivm = new IndexViewModel();
-            //int pageSize = 10; //amount of objects on page
-            //IEnumerable<Person> personsPerPages;
             Person pers = new Person();
             var client = new RestClient($"https://randomuser.me/api/?results=1000&nat=ru");
             var request = new RestRequest(Method.GET);
@@ -104,7 +130,7 @@ namespace PhonesAndPeople.Controllers
             if (response.IsSuccessful )
             {
                 var content = JsonConvert.DeserializeObject<JToken>(response.Content);
-                while (i < 1000)
+                while (i < content.Count())
                 {
                     var str = content["results"][i];
                     pers.FirstName = str["name"]["title"].Value<string>();
@@ -115,83 +141,16 @@ namespace PhonesAndPeople.Controllers
                     pers.Picture = str["picture"]["medium"].Value<string>();
                     pers.PictureBig = str["picture"]["large"].Value<string>();
                     pers.DoB = str["dob"]["date"].Value<DateTime>();
+                    pers.Password = str["login"]["password"].Value<string>();
                     db.People.Add(pers);
                     db.SaveChanges();
                     i++;
                 }
             }
-            //personsPerPages = db.People.ToList()
-            //        .OrderBy(x => x.Id)
-            //        .Skip((page - 1) * pageSize)
-            //        .Take(pageSize).ToList();
-            //PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = db.People.Count() };
-            //ivm.PageInfo = pageInfo;
-            //ivm.People = personsPerPages;
             return RedirectToAction("ShowPeople");
         }
 
-        public ActionResult ShowSearchResult(int page = 1)
-        {
-            IndexViewModel ivm = new IndexViewModel();
-            int pageSize = 10; //amount of objects on page
-            IEnumerable<Person> personsPerPages;
-            Person pers = new Person();
-            List<Person> people = new List<Person>();
-
-            personsPerPages = people
-                    .OrderBy(x => x.Id)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize).ToList();
-            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = db.People.Count() };
-            ivm.PageInfo = pageInfo;
-            ivm.People = personsPerPages;
-
-            return PartialView(ivm);
-        }
-
-        [HttpPost]
-        public ActionResult NameSearch(string fName ="", string sName = "", string lName = "", int page = 1)
-        {
-            IndexViewModel ivm = new IndexViewModel();
-            int pageSize = 10; //amount of objects on page
-            IEnumerable<Person> personsPerPages;
-            Person pers = new Person();
-
-            List<Person> people = new List<Person>();
-            people = db.People.ToList();
-            if (fName != "")
-                people = people.Where(a => a.FirstName.Contains(fName)).ToList();
-            if (sName != "")
-                people = people.Where(a => a.SecondName.Contains(sName)).ToList();
-            if (lName != "")
-                people = people.Where(a => a.LastName.Contains(lName)).ToList();
-
-            personsPerPages = ppl
-                    .OrderBy(x => x.Id)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize).ToList();
-            PageInfo pageInfo = new PageInfo { PageNumber = page, PageSize = pageSize, TotalItems = db.People.Count() };
-            ivm.PageInfo = pageInfo;
-            ivm.People = personsPerPages;
-
-            return PartialView();
-        }
-
-        public async Task<ActionResult> Sort(SortState sortOrder = SortState.FNameAsc)
-        {
-            IQueryable<Person> people = db.People;
-            ViewData["FNameSort"] = sortOrder == SortState.FNameAsc ? SortState.FNameDesc : SortState.FNameAsc;
-            ViewData["SNameSort"] = sortOrder == SortState.SNameAsc ? SortState.SNameDesc : SortState.SNameAsc;
-            ViewData["LNameSort"] = sortOrder == SortState.LNameAsc ? SortState.LNameDesc : SortState.LNameAsc;
-
-            if (sortOrder == SortState.FNameDesc) people = people.OrderByDescending(s => s.FirstName);
-            if (sortOrder == SortState.FNameAsc) people = people.OrderBy(s => s.FirstName);
-            if (sortOrder == SortState.SNameAsc) people = people.OrderBy(s => s.SecondName);
-            if (sortOrder == SortState.SNameDesc) people = people.OrderByDescending(s => s.SecondName);
-            if (sortOrder == SortState.LNameAsc) people = people.OrderBy(s => s.LastName); 
-            if (sortOrder == SortState.LNameDesc) people = people.OrderByDescending(s => s.SecondName);
-            return View(await people.AsNoTracking().ToListAsync());
-        }
+        [Authorize(Roles = "admin")]
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";

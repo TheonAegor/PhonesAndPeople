@@ -1,43 +1,41 @@
 ﻿@model PhonesAndPeople.Models.IndexViewModel
 @using PhonesAndPeople.Helpers
 @Styles.Render("~/Content/css")
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
+@Scripts.Render("~/highslide.js")
 @{
     ViewBag.Title = "ShowPpl";
 }
 <table id="olo" class="table">
-    <tr>
-        <th>
-            Фото
-        </th>
-        <th>
-            <a id="sortFname" class="sort" onclick="sortAttr(1)">
-                Префикс
-            </a> 
-        </th>
-        <th>
-            <a id="sortSname" class="sort" onclick="sortAttr(2)">
-                Имя
-            </a>
-        </th>
-        <th>
-            <a id="sortLname" class="sort" onclick="sortAttr(3)">
-                Фамилия
-            </a>
-        </th>
-        <th>
-            <a id="sortDob">
-                Дата рождения
-            </a>
-        </th>
-        <th>
-            Телефон
-        </th>
-        <th>
-            Почта
-        </th>
-        <th></th>
-    </tr>
-    <tbody>
+    <tbody class="person-data-header">
+        <tr>
+            <th>
+                Фото
+            </th>
+            <th>
+                <a id="sortFname" class="sort" onclick="sortAttr2(1)">
+                    Префикс
+                </a>
+            </th>
+            <th>
+                <a id="sortSname" class="sort" onclick="sortAttr2(2)">
+                    Имя
+                </a>
+            </th>
+            <th>
+                <a id="sortLname" class="sort" onclick="sortAttr2(3)">
+                    Фамилия
+                </a>
+            </th>
+            <th>
+                <a id="sortDob" class="sort" onclick="sortAttr2(4)">
+                    Дата рождения
+                </a>
+            </th>
+        </tr>
+    </tbody>
+    <tbody class="person-data">
         @foreach (var item in Model.People)
         {
             <tr>
@@ -55,15 +53,7 @@
                     @Html.DisplayFor(modelItem => item.LastName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Phone)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    @Html.DisplayFor(modelItem => item.DoB)
                 </td>
             </tr>
         }
@@ -72,67 +62,124 @@
 <br />
 <div class="btn-group">
     <input id="btn-prev" type="button" name="prev" value="<<" class="btn btn-default" />
+    <input id="btn-first" type="button" name="first" value="1" class="btn btn-default" />
     <input id="btn-this" type="button" name="this" value="@Model.PageInfo.PageNumber" class="btn btn-default btn-primary selected" />
     <input id="btn-last" type="button" name="last" value="@Model.PageInfo.TotalPages" class="btn btn-default" />
     <input id="btn-next" type="button" name="next" value=">>" class="btn btn-default" />
 </div>
 
-@Scripts.Render("~/bundles/jquery")
-@Scripts.Render("~/Scripts/jquery.unobtrusive-ajax.js")
 <script type="text/javascript">
         //alert("Hello");
-        $(document).ready(function (event) {
-            if (@Model.PageInfo.PageNumber <= 1)
-                $("#btn-prev").hide();
-            else {
-                $("#btn-prev").click(function (event) {
-                    $(".btn-group").hide();
-                    prevPage();
-                });
-            }
+    $(document).ready(function (event) {
+        if (@Model.PageInfo.PageNumber == 1) {
+            $("#btn-first").hide();
+        }
+        else {
+            $("#btn-first").show();
+            $("#btn-first").click(function (event) {
+                $(".btn-group").hide();
+                goToPage(1);
+            });
+        }
+
+        if (@Model.PageInfo.PageNumber <= 1)
+            $("#btn-prev").hide();
+        else {
+            $("#btn-prev").click(function (event) {
+                $(".btn-group").hide();
+                prevPage();
+            });
+        }
+
+        if (@Model.PageInfo.PageNumber != @Model.PageInfo.TotalPages) {
+            $("#btn-last").show();
             $("#btn-last").click(function (event) {
                 //alert("Last page click.")
                 $(".btn-group").hide();
                 lastPage();
             });
+        }
+        else
+            $("#btn-last").hide();
+
+        if (@Model.PageInfo.PageNumber >= @Model.PageInfo.TotalPages)
+            $("#btn-next").hide();
+        else {
             $("#btn-next").click(function (event) {
                 //alert("Next page click.")
                 $(".btn-group").hide();
                 nextPage();
+
             });
+        }
+    });
+    function goToPage(page) {
+        $.ajax({
+            url: "ShowPpl",
+            type: "POST",
+            data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": num },
+            success: function (result) {
+                $("#olo").html(result);
+            }
         });
+    }
     function prevPage() {
         $.ajax({
             url: "ShowPpl",
             type: "POST",
             data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": (@Model.PageInfo.PageNumber - 1) },
             success: function (result) {
-                alert("succes handler is called.");
+                //alert("succes handler is called.");
                 $('#olo').html(result);
             }
         });
     }
-        function nextPage() {
-            $.ajax({
-                url: "ShowPpl",
-                type: "POST",
-                data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.PageNumber + 1 },
-                success: function (result) {
-                    alert("succes handler is called.");
-                    $('#olo').html(result);
-                }
-            });
-        }
-        function lastPage() {
-            $.ajax({
-                url: "ShowPpl",
-                type: "POST",
-                data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.TotalPages },
-                success: function (result) {
-                    alert("succes handler is called.");
-                    $('#olo').html(result);
-                }
-            });
-        }
+    function nextPage() {
+        $.ajax({
+            url: "ShowPpl",
+            type: "POST",
+            data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.PageNumber + 1 },
+            success: function (result) {
+                //alert("succes handler is called.");
+                $('#olo').html(result);
+            }
+        });
+    }
+    function lastPage() {
+        $.ajax({
+            url: "ShowPpl",
+            type: "POST",
+            data: { "sortOrder": '@ViewBag.LastSortAttr', "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val(), "page": @Model.PageInfo.TotalPages },
+            success: function (result) {
+                //alert("succes handler is called.");
+                $('#olo').html(result);
+            }
+        });
+    }
+    function sortAttr2(num) {
+        $(".btn-group").hide();
+        var n;
+        //alert("FNameSort = " + ViewBag.FNameSort);
+        if (num === 1)
+            n = '@ViewBag.FNameSort';
+        if (num == 2)
+            n = '@ViewBag.SNameSort';
+        if (num == 3)
+            n = '@ViewBag.LNameSort';
+        if (num == 4)
+            n = '@ViewBag.Dob';
+
+
+        alert("inside sortAttr n=" + n);
+        $.ajax({
+            url: "ShowPpl",
+            method: "POST",
+            data: { "sortOrder": n, "fName": $("input.fname").val(), "sName": $("input.sname").val(), "lName": $("input.lname").val() },
+            success: function (result) {
+                //alert("succes handler is called.");
+                $('#olo').html(result);
+            }
+        });
+    }
 </script>
 

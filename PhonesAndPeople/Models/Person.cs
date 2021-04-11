@@ -47,6 +47,8 @@ namespace PhonesAndPeople.Models
         AgeAsc, // по возрасту по возрастанию
         AgeDesc,    // по возрасту по убыванию
         CompanyAsc, // по компании по возрастанию
-        CompanyDesc // по компании по убыванию
+        CompanyDesc, // по компании по убыванию
+        DobDesc,
+        DobAsc
     }
 }

@@ -14,7 +14,8 @@ namespace PhonesAndPeople
     {
         protected void Application_Start()
         {
-            //Database.SetInitializer(new PeopleDbInitializer());
+            //Database.SetInitializer(new UserDbInitializer());
+
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
