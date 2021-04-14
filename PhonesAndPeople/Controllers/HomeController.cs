@@ -116,7 +116,6 @@ namespace PhonesAndPeople.Controllers
                 people = people.Where(p => p.DoB.Month == month).ToList();
             if (day > 0)
                 people = people.Where(p => p.DoB.Day == day).ToList();
-
             if (fName != "")
                 people = people.Where(a => a.FirstName.Contains(fName)).ToList();
             if (sName != "")
@@ -124,8 +123,7 @@ namespace PhonesAndPeople.Controllers
             if (lName != "")
                 people = people.Where(a => a.LastName.Contains(lName)).ToList();
 
-            //IQueryable<Person> people = db.People;
-            IQueryable<Person> ppl= people.AsQueryable(); ;
+            IQueryable<Person> ppl= people.AsQueryable();
             
             ViewData["FNameSort"] = sortOrder == SortState.FNameAsc ? SortState.FNameDesc : SortState.FNameAsc;
             ViewData["SNameSort"] = sortOrder == SortState.SNameAsc ? SortState.SNameDesc : SortState.SNameAsc;
@@ -200,17 +198,6 @@ namespace PhonesAndPeople.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
-        }
-        [HttpGet]
-        public ActionResult TestAjax()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public PartialViewResult TestAjaxPost()
-        {
-            return PartialView();
         }
 
         protected override void Dispose(bool disposing)

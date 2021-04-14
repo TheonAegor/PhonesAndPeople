@@ -189,15 +189,8 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index2.cshtml" />
     <Content Include="Views\Home\ShowPeople.cshtml" />
-    <Content Include="Views\Home\FNameSearch.cshtml" />
-    <Content Include="Views\Home\SNameSearch.cshtml" />
-    <Content Include="Views\Home\NameSearch.cshtml" />
-    <Content Include="Views\Home\Sort.cshtml" />
-    <Content Include="Views\Home\ShowSearchResult.cshtml" />
     <Content Include="Views\Home\ShowPpl.cshtml" />
-    <Content Include="Views\Home\TestAjax.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\SimpleView.cshtml" />
